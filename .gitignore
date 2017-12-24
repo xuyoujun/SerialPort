@@ -1,0 +1,16 @@
+*.sln
+*.sdf
+*.swp
+*.opendb
+*.exe
+Debug/
+ipch/
+.vs/
+Release/
+SerialPort/Debug
+SerialPort/Release
+*.txt
+*.vcxproj
+*.filters
+*.user
+
