@@ -400,6 +400,13 @@ void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 	int receive_height = 0;
 	int receive_width = 0;
 
+	int send_left = 0;
+	int send_top = 0;
+	int send_right = 0;
+	int send_bottom = 0;
+	int send_height = 0;
+	int send_width = 0;
+
 	int temp_left   = 0;
 	int temp_top    = 0;
 	int temp_right  = 0;
@@ -412,6 +419,10 @@ void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 	RECT radio1_pos;
 	RECT radio2_pos;
 	RECT clear_pos;
+	RECT radio3_pos;
+	RECT radio4_pos;
+	RECT clear_send_pos;
+	RECT send_pos;
 
 	RECT rich_edit_pos1;
 	RECT rich_edit_pos2;
@@ -421,7 +432,11 @@ void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 	HWND hwnd_static_send;
 	HWND hwnd_radio1;
 	HWND hwnd_radio2;
+	HWND hwnd_radio3;
+	HWND hwnd_radio4;
 	HWND hwnd_clear_receive;
+	HWND hwnd_clear_send;
+	HWND hwnd_send;
 
 	hwnd_editor_riceive = GetDlgItem(hwnd, IDC_RICHEDIT22);
 	hwnd_static_send    = GetDlgItem(hwnd, IDC_STATIC_SEND);
@@ -429,7 +444,11 @@ void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 	hwnd_editor_send    = GetDlgItem(hwnd, IDC_EDIT2);
 	hwnd_radio1         = GetDlgItem(hwnd, IDC_RADIO1);
 	hwnd_radio2         = GetDlgItem(hwnd, IDC_RADIO2);
-	hwnd_clear_receive  = GetDlgItem(hwnd, IDC_CLEAR_RECEIVE);
+	hwnd_radio3 = GetDlgItem(hwnd, IDC_RADIO3);
+	hwnd_radio4 = GetDlgItem(hwnd, IDC_RADIO4);
+	hwnd_clear_receive = GetDlgItem(hwnd, IDC_CLEAR_RECEIVE);
+	hwnd_clear_send  = GetDlgItem(hwnd, IDC_CLEAR_SEND);
+	hwnd_send = GetDlgItem(hwnd, IDC_SEND);
 
 	GetClientRect(hwnd, &mian_windiw_pos); // 获取窗口客户区大小
 	GetWindowRect(hwnd_editor_riceive, &rich_edit_pos1);
@@ -496,11 +515,11 @@ void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 
 	int radio1_width = (radio1_pos.right - radio1_pos.left);
 	int radio2_width = (radio2_pos.right - radio2_pos.left);
-	int clear_width  = (clear_pos.right - clear_pos.left);
+	//int clear_width  = (clear_pos.right - clear_pos.left);
 	int space_width = temp_width - radio1_width - radio2_width - temp_width / 6;// clear_width;
 
 
-	temp_left = receive_left + GAP;
+	//temp_left   = receive_left + GAP;
 	temp_height = (receive_height - GAP) * 0.15;
 	temp_top = receive_top + GAP + (receive_height - GAP) * 0.85 + temp_height * 0.1;
 
@@ -509,29 +528,63 @@ void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 
 	
 	temp_left = receive_left + GAP + radio1_width + space_width / 2;
-	//temp_top = top + temp_height + GAP + 10;
 	MoveWindow(hwnd_radio2, temp_left, temp_top, radio2_width, temp_height * 0.8, TRUE);
 
-	temp_left = receive_left + GAP + temp_width * 5/6;
-	//temp_top = top + temp_height + GAP + 10;
-	MoveWindow(hwnd_clear_receive, temp_left, temp_top, temp_width /6, temp_height * 0.8, TRUE);
+	temp_left = receive_left + GAP + temp_width * 5/7;
+	MoveWindow(hwnd_clear_receive, temp_left, temp_top, temp_width *2/7, temp_height * 0.8, TRUE);
 
 
 	//set send data area
-	temp_left = left;
-	temp_top = top + (height * 8 / 11);
-	temp_height = height * 3 / 11;
-	temp_width = width;
-	MoveWindow(hwnd_static_send, temp_left, temp_top, temp_width, temp_height, TRUE);
+	send_left = left;
+	send_top = top + (height * 8 / 11);
+	send_height = height * 3 / 11;
+	send_width = width;
+	MoveWindow(hwnd_static_send, send_left, send_top, send_width, send_height, TRUE);
 
 
-	temp_left = temp_left + GAP;
-	temp_top  = temp_top + GAP;
-	temp_height = SEND_EDITOR_HEIGHT;
-	temp_width = temp_width - 2 *GAP;
+
+	temp_left =   send_left + GAP;
+	temp_top  =   send_top + GAP;
+	temp_height = (send_height - GAP) *0.4;
+	temp_width = send_width - 2 *GAP;
 	MoveWindow(hwnd_editor_send, temp_left, temp_top, temp_width, temp_height, TRUE);
 	
 
+	//GetClientRect(hwnd_radio1, &radio1_pos);
+	GetClientRect(hwnd_radio3, &radio3_pos);
+	GetClientRect(hwnd_send, &send_pos);
+
+	int radio3_width = (radio3_pos.right - radio3_pos.left);
+	//int send_width = (send_pos.right - send_pos.left);
+
+	//temp_left = send_left + GAP;
+	temp_height = (send_height - GAP) *0.3;
+	temp_top = send_top + GAP + (send_height - GAP) *0.4 + temp_height * 0.1;
+
+	temp_width = send_width - 2 * GAP;
+	MoveWindow(hwnd_radio3, temp_left, temp_top, radio3_width, temp_height * 0.8, TRUE);
+
+
+	//temp_height = (send_height - GAP) *0.3;
+	//temp_top = send_top + GAP + (send_height - GAP) *0.4 + temp_height * 0.1;
+	temp_left = send_left + GAP + (send_width - 2 * GAP) * 5 / 7;
+	temp_width = (send_width - 2 * GAP) * 2/7;
+	MoveWindow(hwnd_send, temp_left, temp_top, temp_width, temp_height * 0.8, TRUE);
+
+
+	//radio4
+	temp_height = (send_height - GAP) *0.3;
+	temp_top = send_top + GAP + (send_height - GAP) *0.7 + temp_height * 0.1;
+	temp_left = send_left + GAP;
+	temp_width = send_width - 2 * GAP;
+	MoveWindow(hwnd_radio4, temp_left, temp_top, radio3_width, temp_height * 0.8, TRUE);
+
+
+	//temp_height = (send_height - GAP) *0.3;
+	//temp_top = send_top + GAP + (send_height - GAP) *0.4 + temp_height * 0.1;
+	temp_left = send_left + GAP + (send_width - 2 * GAP) * 5 / 7;
+	temp_width = (send_width - 2 * GAP) * 2/ 7;
+	MoveWindow(hwnd_clear_send, temp_left, temp_top, temp_width, temp_height * 0.8, TRUE);
 	// receive data area
 	/*s.Format(_T("top = %d  bottom = %d  left = %d  right = %d  top = %d  bottom = %d  left = %d  right = %d  top = %d  bottom = %d  left = %d  right = %d  "), mian_windiw_pos.top, mian_windiw_pos.bottom, mian_windiw_pos.left, mian_windiw_pos.right,
 		
