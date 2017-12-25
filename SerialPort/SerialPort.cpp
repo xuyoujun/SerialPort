@@ -8,14 +8,28 @@
 #include <atlstr.h>
 #include "OpenSerialPort.h"
 
-#define MAX_BUFFER_SIZE        (1024)
-#define MAX_COMM_NUM           (32)
-						       
-#define MAX_BOUD_BUFFER        (16)
-#define GAP                    (20)
-#define BORDER_GAP             (30)
-#define SEND_EDITOR_HEIGHT     (40)
-#define HEIGHT_TOTAL_PORTION   (11)
+#define MAX_BUFFER_SIZE                       (1024)
+#define MAX_COMM_NUM                          (32)
+						                      
+#define MAX_BOUD_BUFFER                       (16)
+#define GAP                                   (20)
+#define BORDER_GAP                            (30)
+#define SEND_EDITOR_HEIGHT                    (40)
+							                 
+							                 
+#define HEIGHT_TOTAL_PORTION                  (11)
+#define HEIGHT_RECEIVE_PORTION                (7)
+#define HEIGHT_GAP_PORTION                    (1)
+#define HEIGHT_SEND_PORTION                   (3)
+
+#define HEIGHT_RECEIVE_AREA_TOTOAL_PORTION    (9)
+#define HEIGHT_RECEIVE_AREA_EDITOR_PORTION    (8)
+#define HEIGHT_RECEIVE_AREA_CONTROL_PORTION   (1)
+
+#define HEIGHT_SEND_AREA_TOTOAL_PORTION      (10)
+#define HEIGHT_SEND_AREA_EDITOR_PORTION      (4)
+#define HEIGHT_SEND_AREA_CONTROL1_PORTION    (3)
+#define HEIGHT_SEND_AREA_CONTROL2_PORTION    (3)
 
 static HANDLE com_handler = INVALID_HANDLE_VALUE;//串口句柄
 static TCHAR  visibla[10000] = { 0 };//
@@ -365,33 +379,14 @@ BOOL Close_Serial_Port(HWND hwnd) {
 }
 
 
-BOOL Main_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
-{
-	//HWND hwndIDCLOSE = GetDlgItem(hwnd,IDCLOSE);//获得关闭按钮的句柄
-	//ShowWindow(hwndIDCLOSE,SW_HIDE);//先隐蔽关闭串口选项
-	//ShowWindow(hwndIDOK,SW_);
-	BOOL result = FALSE;
-	set_candidate_comm_name(hwnd);
-	set_candidate_boud_rate(hwnd);
-	set_candidate_data_bit(hwnd);
-	set_candidate_stop_bit(hwnd);
-	set_candidate_check_bit(hwnd);
-	set_candidate_data_format(hwnd);
-	//加载图标文件...
-	set_default_icon(hwnd);
-	return TRUE;
-}
 
-
-void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
-{
-
-	int left   = 0;
-	int top    = 0;
-	int right  = 0;
+void set_layout(HWND hwnd){
+	int left = 0;
+	int top = 0;
+	int right = 0;
 	int bottom = 0;
 	int height = 0;
-	int width  = 0;
+	int width = 0;
 
 	int receive_left = 0;
 	int receive_top = 0;
@@ -407,12 +402,19 @@ void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 	int send_height = 0;
 	int send_width = 0;
 
-	int temp_left   = 0;
-	int temp_top    = 0;
-	int temp_right  = 0;
+	int temp_left = 0;
+	int temp_top = 0;
+	int temp_right = 0;
 	int temp_bottom = 0;
 	int temp_height = 0;
-	int temp_width  = 0;
+	int temp_width = 0;
+
+	int radio1_width;
+	int radio2_width;
+	int radio3_width;
+	int	radio4_width;
+	int space_width;
+	int space_height;
 
 	CString s;
 	RECT mian_windiw_pos;
@@ -423,9 +425,11 @@ void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 	RECT radio4_pos;
 	RECT clear_send_pos;
 	RECT send_pos;
+	RECT comm_open_pos;
 
 	RECT rich_edit_pos1;
 	RECT rich_edit_pos2;
+
 	HWND hwnd_editor_riceive;
 	HWND hwnd_editor_send;
 	HWND hwnd_static_receive;
@@ -437,18 +441,24 @@ void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 	HWND hwnd_clear_receive;
 	HWND hwnd_clear_send;
 	HWND hwnd_send;
+	HWND hwnd_comm_close;
+	HWND hwnd_comm_open;
+	HWND hwnd_comm_fresh;
 
 	hwnd_editor_riceive = GetDlgItem(hwnd, IDC_RICHEDIT22);
-	hwnd_static_send    = GetDlgItem(hwnd, IDC_STATIC_SEND);
+	hwnd_static_send = GetDlgItem(hwnd, IDC_STATIC_SEND);
 	hwnd_static_receive = GetDlgItem(hwnd, IDC_STATIC_RECEIVE);
-	hwnd_editor_send    = GetDlgItem(hwnd, IDC_EDIT2);
-	hwnd_radio1         = GetDlgItem(hwnd, IDC_RADIO1);
-	hwnd_radio2         = GetDlgItem(hwnd, IDC_RADIO2);
+	hwnd_editor_send = GetDlgItem(hwnd, IDC_EDIT2);
+	hwnd_radio1 = GetDlgItem(hwnd, IDC_RADIO1);
+	hwnd_radio2 = GetDlgItem(hwnd, IDC_RADIO2);
 	hwnd_radio3 = GetDlgItem(hwnd, IDC_RADIO3);
 	hwnd_radio4 = GetDlgItem(hwnd, IDC_RADIO4);
 	hwnd_clear_receive = GetDlgItem(hwnd, IDC_CLEAR_RECEIVE);
-	hwnd_clear_send  = GetDlgItem(hwnd, IDC_CLEAR_SEND);
+	hwnd_clear_send = GetDlgItem(hwnd, IDC_CLEAR_SEND);
 	hwnd_send = GetDlgItem(hwnd, IDC_SEND);
+	hwnd_comm_close = GetDlgItem(hwnd, ID_CLOSE);
+	hwnd_comm_open  = GetDlgItem(hwnd, ID_OPEN);
+	hwnd_comm_fresh = GetDlgItem(hwnd, ID_FRESH);
 
 	GetClientRect(hwnd, &mian_windiw_pos); // 获取窗口客户区大小
 	GetWindowRect(hwnd_editor_riceive, &rich_edit_pos1);
@@ -485,117 +495,150 @@ void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 	|	|								|	|
 	|	---------------------------------	|
 	-----------------------------------------
-*/ 
+	*/
 
 	//range include receive and send data area
-	left   = rich_edit_pos1.left - GAP;
-	top    = rich_edit_pos1.top  - GAP;
-	right  = mian_windiw_pos.right;
+	left = rich_edit_pos1.left - GAP;
+	top = rich_edit_pos1.top - GAP;
+	right = mian_windiw_pos.right;
 	bottom = mian_windiw_pos.bottom;
 	height = (bottom - top) - BORDER_GAP;
-	width  = (right - left) - BORDER_GAP;
+	width = (right - left) - BORDER_GAP;
 
 	//set receive data area
-	receive_left   = left;
-	receive_top    = top;
-	receive_height = height * 7/11;
-	receive_width  = width;
-	MoveWindow(hwnd_static_receive, receive_left, receive_top, receive_width, receive_height , TRUE);
-	
-	temp_left   = receive_left + GAP;
-	temp_top    = receive_top + GAP;
-	temp_height = (receive_height - GAP) * 0.85;
-	temp_width  = width - 2 * GAP;
+	receive_left = left;
+	receive_top = top;
+	receive_height = height * HEIGHT_RECEIVE_PORTION / HEIGHT_TOTAL_PORTION;
+	receive_width = width;
+	MoveWindow(hwnd_static_receive, receive_left, receive_top, receive_width, receive_height, TRUE);
+
+	//set receive data editor
+	temp_left = receive_left + GAP;
+	temp_top = receive_top + GAP;
+	temp_height = (receive_height - GAP) * HEIGHT_RECEIVE_AREA_EDITOR_PORTION / HEIGHT_RECEIVE_AREA_TOTOAL_PORTION;
+	temp_width = width - 2 * GAP;
 	MoveWindow(hwnd_editor_riceive, temp_left, temp_top, temp_width, temp_height, TRUE);
-	
 
+	//receive data control area
 	GetClientRect(hwnd_radio1, &radio1_pos);
-	GetClientRect(hwnd_radio1, &radio2_pos);
-	GetClientRect(hwnd_radio1, &clear_pos);
+	GetClientRect(hwnd_radio2, &radio2_pos);
+	radio1_width = (radio1_pos.right - radio1_pos.left);
+	radio2_width = (radio2_pos.right - radio2_pos.left);
+	space_width = temp_width - radio1_width - radio2_width - temp_width * 2 / 7;// clear_width;
 
-	int radio1_width = (radio1_pos.right - radio1_pos.left);
-	int radio2_width = (radio2_pos.right - radio2_pos.left);
-	//int clear_width  = (clear_pos.right - clear_pos.left);
-	int space_width = temp_width - radio1_width - radio2_width - temp_width / 6;// clear_width;
+																				//radio1
+	temp_height = (receive_height - GAP) * HEIGHT_RECEIVE_AREA_CONTROL_PORTION / HEIGHT_RECEIVE_AREA_TOTOAL_PORTION;
+	temp_top = receive_top + GAP + (receive_height - GAP) * HEIGHT_RECEIVE_AREA_EDITOR_PORTION / HEIGHT_RECEIVE_AREA_TOTOAL_PORTION + temp_height * 1 / 10;
 
+	MoveWindow(hwnd_radio1, temp_left, temp_top, radio1_width, temp_height * 8 / 10, TRUE);
 
-	//temp_left   = receive_left + GAP;
-	temp_height = (receive_height - GAP) * 0.15;
-	temp_top = receive_top + GAP + (receive_height - GAP) * 0.85 + temp_height * 0.1;
+	//radio2
 
-
-	MoveWindow(hwnd_radio1, temp_left, temp_top, radio1_width, temp_height * 0.8, TRUE);
-
-	
 	temp_left = receive_left + GAP + radio1_width + space_width / 2;
-	MoveWindow(hwnd_radio2, temp_left, temp_top, radio2_width, temp_height * 0.8, TRUE);
+	MoveWindow(hwnd_radio2, temp_left, temp_top, radio2_width, temp_height * 8 / 10, TRUE);
 
-	temp_left = receive_left + GAP + temp_width * 5/7;
-	MoveWindow(hwnd_clear_receive, temp_left, temp_top, temp_width *2/7, temp_height * 0.8, TRUE);
+	//clear command
+	temp_left = receive_left + GAP + temp_width * 5 / 7;
+	MoveWindow(hwnd_clear_receive, temp_left, temp_top, temp_width * 2 / 7, temp_height * 8 / 10, TRUE);
 
 
-	//set send data area
+	//send  data area
 	send_left = left;
-	send_top = top + (height * 8 / 11);
-	send_height = height * 3 / 11;
+	send_top = top + height * (HEIGHT_RECEIVE_PORTION + HEIGHT_GAP_PORTION) / HEIGHT_TOTAL_PORTION;
+	send_height = height * HEIGHT_SEND_PORTION / HEIGHT_TOTAL_PORTION;
 	send_width = width;
 	MoveWindow(hwnd_static_send, send_left, send_top, send_width, send_height, TRUE);
 
+	//comm open button
+	GetWindowRect(hwnd_comm_open, &comm_open_pos);
+	ScreenToClient(hwnd, (LPPOINT)&comm_open_pos);
 
+	temp_left = comm_open_pos.left;
+	temp_top = send_top + 10;
 
-	temp_left =   send_left + GAP;
-	temp_top  =   send_top + GAP;
-	temp_height = (send_height - GAP) *0.4;
-	temp_width = send_width - 2 *GAP;
-	MoveWindow(hwnd_editor_send, temp_left, temp_top, temp_width, temp_height, TRUE);
+	GetClientRect(hwnd_comm_open, &comm_open_pos);
+	temp_width = comm_open_pos.right - comm_open_pos.left;
+	temp_height = comm_open_pos.bottom - comm_open_pos.top;
+	MoveWindow(hwnd_comm_open, temp_left, temp_top, temp_width, temp_height, TRUE);
 	
+	//comm close button
+	temp_top +=  20 + temp_height;
+	MoveWindow(hwnd_comm_close, temp_left, temp_top, temp_width, temp_height, TRUE);
+	
+	//comm fresh button
+	temp_top += 20 + temp_height;
+	MoveWindow(hwnd_comm_fresh, temp_left, temp_top, temp_width, temp_height, TRUE);
+	
+	
+	//send editor
+	temp_left = send_left + GAP;
+	temp_top = send_top + GAP;
+	temp_height = (send_height - GAP) * HEIGHT_SEND_AREA_EDITOR_PORTION / HEIGHT_SEND_AREA_TOTOAL_PORTION;
+	temp_width = send_width - 2 * GAP;
+	MoveWindow(hwnd_editor_send, temp_left, temp_top, temp_width, temp_height, TRUE);
 
-	//GetClientRect(hwnd_radio1, &radio1_pos);
+	//send data control area
 	GetClientRect(hwnd_radio3, &radio3_pos);
-	GetClientRect(hwnd_send, &send_pos);
+	radio3_width = (radio3_pos.right - radio3_pos.left);
 
-	int radio3_width = (radio3_pos.right - radio3_pos.left);
-	//int send_width = (send_pos.right - send_pos.left);
-
-	//temp_left = send_left + GAP;
-	temp_height = (send_height - GAP) *0.3;
-	temp_top = send_top + GAP + (send_height - GAP) *0.4 + temp_height * 0.1;
+	//radio3
+	temp_height = (send_height - GAP) * HEIGHT_SEND_AREA_CONTROL1_PORTION / HEIGHT_SEND_AREA_TOTOAL_PORTION;
+	temp_top = send_top + GAP + (send_height - GAP) *  HEIGHT_SEND_AREA_EDITOR_PORTION / HEIGHT_SEND_AREA_TOTOAL_PORTION + temp_height * 1 / 10;
 
 	temp_width = send_width - 2 * GAP;
-	MoveWindow(hwnd_radio3, temp_left, temp_top, radio3_width, temp_height * 0.8, TRUE);
+	MoveWindow(hwnd_radio3, temp_left, temp_top, radio3_width, temp_height * 8 / 10, TRUE);
 
-
-	//temp_height = (send_height - GAP) *0.3;
-	//temp_top = send_top + GAP + (send_height - GAP) *0.4 + temp_height * 0.1;
+	//send command
 	temp_left = send_left + GAP + (send_width - 2 * GAP) * 5 / 7;
-	temp_width = (send_width - 2 * GAP) * 2/7;
-	MoveWindow(hwnd_send, temp_left, temp_top, temp_width, temp_height * 0.8, TRUE);
-
+	temp_width = (send_width - 2 * GAP) * 2 / 7;
+	MoveWindow(hwnd_send, temp_left, temp_top, temp_width, temp_height * 8 / 10, TRUE);
 
 	//radio4
-	temp_height = (send_height - GAP) *0.3;
-	temp_top = send_top + GAP + (send_height - GAP) *0.7 + temp_height * 0.1;
+	temp_top = send_top + GAP + (send_height - GAP) * (HEIGHT_SEND_AREA_EDITOR_PORTION + HEIGHT_SEND_AREA_CONTROL1_PORTION) / HEIGHT_SEND_AREA_TOTOAL_PORTION + temp_height * 0.1;
 	temp_left = send_left + GAP;
 	temp_width = send_width - 2 * GAP;
-	MoveWindow(hwnd_radio4, temp_left, temp_top, radio3_width, temp_height * 0.8, TRUE);
+	MoveWindow(hwnd_radio4, temp_left, temp_top, radio3_width, temp_height * 8 / 10, TRUE);
 
-
-	//temp_height = (send_height - GAP) *0.3;
-	//temp_top = send_top + GAP + (send_height - GAP) *0.4 + temp_height * 0.1;
+	//clear command
 	temp_left = send_left + GAP + (send_width - 2 * GAP) * 5 / 7;
-	temp_width = (send_width - 2 * GAP) * 2/ 7;
-	MoveWindow(hwnd_clear_send, temp_left, temp_top, temp_width, temp_height * 0.8, TRUE);
+	temp_width = (send_width - 2 * GAP) * 2 / 7;
+	MoveWindow(hwnd_clear_send, temp_left, temp_top, temp_width, temp_height * 8 / 10, TRUE);
 	// receive data area
 	/*s.Format(_T("top = %d  bottom = %d  left = %d  right = %d  top = %d  bottom = %d  left = %d  right = %d  top = %d  bottom = %d  left = %d  right = %d  "), mian_windiw_pos.top, mian_windiw_pos.bottom, mian_windiw_pos.left, mian_windiw_pos.right,
-		
-		rich_edit_pos2.top, rich_edit_pos2.bottom, rich_edit_pos2.left, rich_edit_pos2.right,
-		rich_edit_pos1.top, rich_edit_pos1.bottom, rich_edit_pos1.left, rich_edit_pos1.right
-		);*/
+
+	rich_edit_pos2.top, rich_edit_pos2.bottom, rich_edit_pos2.left, rich_edit_pos2.right,
+	rich_edit_pos1.top, rich_edit_pos1.bottom, rich_edit_pos1.left, rich_edit_pos1.right
+	);*/
 
 	//SetDlgItemText(hwnd, IDC_RICHEDIT22, s);
 
 	//MessageBox(hwnd, s, TEXT("Error"), MB_OK);
-//	MoveWindow(hwnd_static_receive, left, top,  width, height, TRUE);
+	//	MoveWindow(hwnd_static_receive, left, top,  width, height, TRUE);
+
+}
+BOOL Main_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
+{
+	//HWND hwndIDCLOSE = GetDlgItem(hwnd,IDCLOSE);//获得关闭按钮的句柄
+	//ShowWindow(hwndIDCLOSE,SW_HIDE);//先隐蔽关闭串口选项
+	//ShowWindow(hwndIDOK,SW_);
+	BOOL result = FALSE;
+	set_candidate_comm_name(hwnd);
+	set_candidate_boud_rate(hwnd);
+	set_candidate_data_bit(hwnd);
+	set_candidate_stop_bit(hwnd);
+	set_candidate_check_bit(hwnd);
+	set_candidate_data_format(hwnd);
+	//加载图标文件...
+	set_default_icon(hwnd);
+	set_layout(hwnd);
+	return TRUE;
+}
+
+
+void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
+{
+	set_layout(hwnd);
+
 }
 
 void Main_OnCommand(HWND hwnd, int command, HWND hwndCtl, UINT codeNotify)
