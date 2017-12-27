@@ -18,11 +18,5 @@
 #define HEIGHT_SEND_AREA_CONTROL1_PORTION    (3)
 #define HEIGHT_SEND_AREA_CONTROL2_PORTION    (3)
 
-BOOL set_candidate_comm_name(HWND hwnd);
-BOOL set_candidate_boud_rate(HWND hwnd);
-BOOL set_candidate_data_bit(HWND hwnd);
-BOOL set_candidate_stop_bit(HWND hwnd);
-BOOL set_candidate_check_bit(HWND hwnd);
-BOOL set_candidate_data_format(HWND hwnd);
-BOOL set_default_icon(HWND hwnd);
+void init_layout(HWND hwnd);
 BOOL set_layout(HWND hwnd);

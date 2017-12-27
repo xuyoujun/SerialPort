@@ -2,13 +2,14 @@
 #include <windows.h>
 #include <windowsx.h>
 #include "resource.h"
-#include "SerialPort.h"
 #include <commdlg.h>
+#include "common.h"
+#include "receive_data.h"
 
 BOOL Set_Serial_Port(HWND hwnd, HANDLE com_handler) {
-	//HWND hwndIDOK    = GetDlgItem(hwnd, IDOK);//隐蔽打开串口按钮
-	//ShowWindow(hwndIDOK,SW_HIDE);
-	//HWND hwndIDCLOSE = GetDlgItem(hwnd, IDCLOSE);//解除对关闭串口按钮的隐蔽
+	HWND hwnd_close;// = GetDlgItem(hwnd, ID_OPEN);//隐蔽打开串口按钮
+
+	HWND hwnd_open;// IDCLOSE = GetDlgItem(hwnd, ID_CLOSE);//解除对关闭串口按钮的隐蔽
 	//ShowWindow(hwndIDCLOSE,SW_SHOW);
 	HWND hwnd_data_bit;  //数据位 handler
 	HWND hwnd_baud_rate; //波特率 handler
@@ -19,7 +20,16 @@ BOOL Set_Serial_Port(HWND hwnd, HANDLE com_handler) {
 	DCB   dcb;
 	COMMTIMEOUTS TimeOuts;
 
-	SetupComm(com_handler, 1024, 1024); //输入缓冲区和输出缓冲区的大小都是1024
+	if (INVALID_HANDLE_VALUE == com_handler) {
+		return FALSE;
+	}
+
+	hwnd_open = GetDlgItem(hwnd, ID_OPEN);//隐蔽打开串口按钮
+	EnableWindow(hwnd_open, FALSE);
+	hwnd_close = GetDlgItem(hwnd, ID_CLOSE);//解除对关闭串口按钮的隐蔽
+	EnableWindow(hwnd_close, TRUE);
+
+	SetupComm(com_handler, MAX_BUFFER_SIZE, MAX_BUFFER_SIZE); //输入缓冲区和输出缓冲区的大小都是1024
 
 	TimeOuts.ReadIntervalTimeout = 1000;//设定读超时
 	TimeOuts.ReadTotalTimeoutMultiplier = 500;
@@ -67,7 +77,7 @@ BOOL Set_Serial_Port(HWND hwnd, HANDLE com_handler) {
 	//SetCommMask(com_handler,);
 
 	/* Create a thread to receive data */
-	CreateThread(NULL, 0, Receive_Serial_Port_Thread, hwnd, 0, 0);//开始读线程
+	CreateThread(NULL, 0, Receive_Serial_Port_Thread, com_handler, 0, 0);//开始读线程
 	return true;
 }
 

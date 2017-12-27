@@ -3,20 +3,32 @@
 #include <windowsx.h>
 #include "resource.h"
 #include <atlstr.h>
-#include "layout.h"
+#include "set_layout.h"
 #include "common.h"
-#include "get_comm_name.h"
 
 
+static BOOL get_comm_name(TCHAR * buffer, UINT32 num) {
+	UINT32 i = 0;
+	UINT32 r = 0;
+	BYTE temp = 0;
+	if (NULL == buffer || num >= MAX_COMM_NUM) {
+		return FALSE;
+	}
+	buffer[i++] = 'C';
+	buffer[i++] = 'O';
+	buffer[i++] = 'M';
+	itoa(num, (char *)&buffer[i], 10);
+	return TRUE;
+}
 
-BOOL set_candidate_comm_name(HWND hwnd) {
+static BOOL set_candidate_comm_name(HWND hwnd) {
 	UINT32 i = 0;
 	HWND  hwnd_comm_sel;
 	BOOL result = FALSE;
 	BYTE comm_name[32] = { 0 };
 	hwnd_comm_sel = GetDlgItem(hwnd, IDC_COMBOSERIAL);//添加串口选项
 	for (i = 0; i < MAX_COMM_NUM; i++) {
-		result = get_comm_name(comm_name, i);
+		result = get_comm_name((TCHAR *)comm_name, i);
 		if (FALSE == result) {
 			break;
 		}
@@ -28,7 +40,7 @@ BOOL set_candidate_comm_name(HWND hwnd) {
 }
 
 
-BOOL set_candidate_boud_rate(HWND hwnd) {
+static BOOL set_candidate_boud_rate(HWND hwnd) {
 	UINT32 i = 0;
 	HWND  hwnd_boud_sel;
 	TCHAR  buffer[MAX_BOUD_BUFFER];
@@ -44,7 +56,7 @@ BOOL set_candidate_boud_rate(HWND hwnd) {
 }
 
 
-BOOL set_candidate_data_bit(HWND hwnd) {
+static BOOL set_candidate_data_bit(HWND hwnd) {
 	HWND hwndDate = GetDlgItem(hwnd, IDC_DATE);//数据位选项
 	ComboBox_InsertString(hwndDate, -1, "4");
 	ComboBox_InsertString(hwndDate, -1, "5");
@@ -55,7 +67,7 @@ BOOL set_candidate_data_bit(HWND hwnd) {
 	return TRUE;
 }
 
-BOOL set_candidate_stop_bit(HWND hwnd) {
+static BOOL set_candidate_stop_bit(HWND hwnd) {
 	HWND hwndStop = GetDlgItem(hwnd, IDC_STOP);//停止位选项
 	ComboBox_InsertString(hwndStop, -1, "1");
 	ComboBox_InsertString(hwndStop, -1, "2");
@@ -63,7 +75,7 @@ BOOL set_candidate_stop_bit(HWND hwnd) {
 	return TRUE;
 }
 
-BOOL set_candidate_check_bit(HWND hwnd) {
+static BOOL set_candidate_check_bit(HWND hwnd) {
 
 	HWND hwnd_check_bit = GetDlgItem(hwnd, IDC_COMBO3);//校检位
 													   //EVENPARITY 偶校验     NOPARITY 无校验
@@ -76,7 +88,7 @@ BOOL set_candidate_check_bit(HWND hwnd) {
 	return TRUE;
 }
 
-BOOL set_candidate_data_format(HWND hwnd) {
+static BOOL set_candidate_data_format(HWND hwnd) {
 
 	HWND receiveHex = GetDlgItem(hwnd, IDC_RADIO1);//接收_得到16进制的按钮句柄
 	Button_SetCheck(receiveHex, 1);//设置默认选项
@@ -85,21 +97,13 @@ BOOL set_candidate_data_format(HWND hwnd) {
 	return TRUE;
 }
 
-BOOL set_default_icon(HWND hwnd) {
+static BOOL set_default_icon(HWND hwnd) {
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(SerialPort));
 	SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	return TRUE;
 }
-
-
-
-
-
-
-
-
-void set_layout(HWND hwnd) {
+BOOL set_layout(HWND hwnd) {
 	int left = 0;
 	int top = 0;
 	int right = 0;
@@ -334,4 +338,17 @@ void set_layout(HWND hwnd) {
 	//MessageBox(hwnd, s, TEXT("Error"), MB_OK);
 	//	MoveWindow(hwnd_static_receive, left, top,  width, height, TRUE);
 
+}
+
+
+void init_layout(HWND hwnd) {
+	set_candidate_comm_name(hwnd);
+	set_candidate_boud_rate(hwnd);
+	set_candidate_data_bit(hwnd);
+	set_candidate_stop_bit(hwnd);
+	set_candidate_check_bit(hwnd);
+	set_candidate_data_format(hwnd);
+	//加载图标文件...
+	set_default_icon(hwnd);
+	set_layout(hwnd);
 }

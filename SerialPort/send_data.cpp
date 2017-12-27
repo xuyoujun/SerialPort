@@ -5,7 +5,7 @@
 #include "SerialPort.h"
 #include <commdlg.h>
 #include "common.h"
-#include "data_format.h"
+#include "format_data.h"
 
 BOOL Send_Serial_Port(HWND hwnd, HANDLE com_handler) {
 

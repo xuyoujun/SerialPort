@@ -5,19 +5,20 @@
 #include "SerialPort.h"
 #include <commdlg.h>
 #include "common.h"
-#include "data_format.h"
+#include "format_data.h"
 
+extern HWND main_hwnd;
 DWORD WINAPI Receive_Serial_Port_Thread(LPVOID lpParam)//用于读线程的函数
 {
-	HWND    hwnd = (HWND)lpParam; //获得串口句柄
+	HANDLE    com_handler = (HANDLE)lpParam; //获得串口句柄
 	TCHAR   lpInBuffer[MAX_BUFFER_SIZE]; //设置读缓冲区
 	DWORD   dwBytesRead = MAX_BUFFER_SIZE;//读取到的字节数
 	BOOL    bReadStatus;//读是否成功
 	DWORD   dwErrorFlags;
 	COMSTAT ComStat;//对串口具有监视作用
 	OVERLAPPED m_osRead;
-	HWND hwnd_hex = GetDlgItem(hwnd, IDC_RADIO1);//接收_得到16进制的按钮句柄
-	HWND hwnd_richedit = GetDlgItem(hwnd, IDC_RICHEDIT22);
+	HWND hwnd_hex = GetDlgItem(main_hwnd, IDC_RADIO1);//接收_得到16进制的按钮句柄
+	HWND hwnd_richedit = GetDlgItem(main_hwnd, IDC_RICHEDIT22);
 
 	INT hex_format = 0;//接收_得到句柄的状态
 	UINT32 i = 0;
