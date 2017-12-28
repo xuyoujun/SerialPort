@@ -350,5 +350,7 @@ void init_layout(HWND hwnd) {
 	set_candidate_data_format(hwnd);
 	//加载图标文件...
 	set_default_icon(hwnd);
+
+
 	set_layout(hwnd);
 }
