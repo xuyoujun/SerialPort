@@ -103,6 +103,15 @@ static BOOL set_default_icon(HWND hwnd) {
 	SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	return TRUE;
 }
+
+
+static BOOL set_richedit_capacity(HWND hwnd) {
+	HWND hwnd_editor;
+	hwnd_editor = GetDlgItem(hwnd, IDC_RICHEDIT22);
+	SendMessage(hwnd_editor, EM_SETLIMITTEXT, -1, 0);
+	return TRUE;
+}
+
 BOOL set_layout(HWND hwnd) {
 	int left = 0;
 	int top = 0;
@@ -350,7 +359,7 @@ void init_layout(HWND hwnd) {
 	set_candidate_data_format(hwnd);
 	//加载图标文件...
 	set_default_icon(hwnd);
-
+	set_richedit_capacity(hwnd);
 
 	set_layout(hwnd);
 }
