@@ -62,7 +62,9 @@ void Main_OnCommand(HWND hwnd, int command, HWND hwndCtl, UINT codeNotify)
 
 			Send_Serial_Port(hwnd, com_handler);
 			break;
-
+		case ID_FRESH:
+			fresh_serial_port(hwnd);
+			break;
 		case IDC_CLEAR_RECEIVE:
 			SetDlgItemText(hwnd,IDC_RICHEDIT22,NULL);//清空接收区
 			break;

@@ -20,3 +20,4 @@
 
 void init_layout(HWND hwnd);
 BOOL set_layout(HWND hwnd);
+BOOL fresh_serial_port(HWND hwnd);

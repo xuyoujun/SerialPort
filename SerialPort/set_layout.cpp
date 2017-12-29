@@ -1,41 +1,47 @@
 #include "stdafx.h"
 #include <windows.h>
 #include <windowsx.h>
+#include <winreg.h>
 #include "resource.h"
 #include <atlstr.h>
 #include "set_layout.h"
 #include "common.h"
 
+#define REG_FILE  "HARDWARE\\DEVICEMAP\\SERIALCOMM"
 
-static BOOL get_comm_name(TCHAR * buffer, UINT32 num) {
-	UINT32 i = 0;
-	UINT32 r = 0;
-	BYTE temp = 0;
-	if (NULL == buffer || num >= MAX_COMM_NUM) {
+static BOOL get_comm_name(TCHAR * buffer, HKEY hkey, UINT index) {
+
+	TCHAR portname[COMM_NAME_LEN];
+	DWORD dwlong = COMM_NAME_LEN;
+	DWORD dwsize = COMM_NAME_LEN;
+	if (NULL == buffer || NULL == hkey) {
 		return FALSE;
 	}
-	buffer[i++] = 'C';
-	buffer[i++] = 'O';
-	buffer[i++] = 'M';
-	itoa(num, (char *)&buffer[i], 10);
+	if (ERROR_NO_MORE_ITEMS == RegEnumValue(hkey, index, portname, &dwlong, NULL, NULL, (PUCHAR)buffer, &dwsize)) {
+		return FALSE;
+	}
 	return TRUE;
 }
 
 static BOOL set_candidate_comm_name(HWND hwnd) {
 	UINT32 i = 0;
-	HWND  hwnd_comm_sel;
-	BOOL result = FALSE;
-	BYTE comm_name[32] = { 0 };
-	hwnd_comm_sel = GetDlgItem(hwnd, IDC_COMBOSERIAL);//添加串口选项
-	for (i = 0; i < MAX_COMM_NUM; i++) {
-		result = get_comm_name((TCHAR *)comm_name, i);
-		if (FALSE == result) {
-			break;
-		}
-		ComboBox_InsertString(hwnd_comm_sel, -1, comm_name);
-		ZeroMemory(comm_name, sizeof(comm_name));
+	HWND  hwnd_sel;
+	BOOL ret = FALSE;
+	HKEY hkey = NULL;
+	BYTE comm_name[COMM_NAME_LEN] = { 0 };
+	hwnd_sel = GetDlgItem(hwnd, IDC_COMBOSERIAL);//添加串口选项
+	ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, REG_FILE, 0, KEY_READ, &hkey);
+	if (ERROR_SUCCESS != ret) {
+		return FALSE;
 	}
-	ComboBox_SetCurSel(hwnd_comm_sel, i / 2);
+	do {
+		ret = get_comm_name((TCHAR *)comm_name, hkey, i++);
+		if (TRUE == ret) {
+			ComboBox_InsertString(hwnd_sel, -1, comm_name);
+		}
+	} while (ret);
+	RegCloseKey(hkey);
+	ComboBox_SetCurSel(hwnd_sel, i / 2);
 	return TRUE;
 }
 
@@ -362,4 +368,36 @@ void init_layout(HWND hwnd) {
 	set_richedit_capacity(hwnd);
 
 	set_layout(hwnd);
+}
+
+
+
+BOOL fresh_serial_port(HWND hwnd) {
+	
+	HKEY hkey = NULL;
+	LONG ret = 0;
+	INT index = 0;
+	HWND hwnd_sel;
+	TCHAR comm_name[COMM_NAME_LEN];
+
+
+	ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, REG_FILE, 0, KEY_READ, &hkey);
+	if (ERROR_SUCCESS != ret) {
+		return FALSE;
+	}
+	hwnd_sel = GetDlgItem(hwnd, IDC_COMBOSERIAL);//添加串口选项
+	
+	// clear the content of hwnd_sel
+	SendMessage(hwnd_sel, CB_RESETCONTENT, 0, 0);
+
+	do{
+		ret = get_comm_name(comm_name, hkey, index++);
+		if (TRUE == ret) {
+			ComboBox_InsertString(hwnd_sel, -1, comm_name);
+			ZeroMemory(comm_name, sizeof(comm_name));
+		}
+	}while (ret);
+	RegCloseKey(hkey);
+	ComboBox_SetCurSel(hwnd_sel, index / 2);
+	return TRUE;
 }
