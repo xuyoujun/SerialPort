@@ -1,10 +1,5 @@
 #include "stdafx.h"
-#include <windows.h>
-#include <windowsx.h>
-#include "resource.h"
-#include <commdlg.h>
-#include "common.h"
-#include "receive_data.h"
+
 
 BOOL Set_Serial_Port(HWND hwnd, HANDLE com_handler) {
 	HWND hwnd_close;// = GetDlgItem(hwnd, ID_OPEN);//隐蔽打开串口按钮

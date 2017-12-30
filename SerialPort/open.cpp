@@ -1,12 +1,5 @@
 #include "stdafx.h"
-#include <windows.h>
-#include <windowsx.h>
-#include <atlstr.h>
-#include <commdlg.h>
 
-#include "resource.h"
-#include "SerialPort.h"
-#include "common.h"
 
 static BOOL get_comm_name(TCHAR *pname,INT len,HWND hwnd) {
 	HWND  hwnd_comm; //获得串口组件的句柄
@@ -22,7 +15,7 @@ static BOOL get_comm_name(TCHAR *pname,INT len,HWND hwnd) {
 }
 
 HANDLE Open_Serial_Port(HWND hwnd) {
-	INT   index;
+//	INT   index;
 	HANDLE hCom;  //串口句柄
 	TCHAR comm_name[COMM_NAME_LEN] = {0};
 	CString str;

@@ -1,11 +1,6 @@
 #include "stdafx.h"
-#include <windows.h>
-#include <windowsx.h>
-#include "resource.h"
-#include "SerialPort.h"
-#include <commdlg.h>
-#include "common.h"
-#include "format_data.h"
+
+
 
 BOOL Send_Serial_Port(HWND hwnd, HANDLE com_handler) {
 

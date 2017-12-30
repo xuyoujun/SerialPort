@@ -1,11 +1,5 @@
 #include "stdafx.h"
-#include <windows.h>
-#include <windowsx.h>
-#include <winreg.h>
-#include "resource.h"
-#include <atlstr.h>
-#include "set_layout.h"
-#include "common.h"
+
 
 #define REG_FILE  "HARDWARE\\DEVICEMAP\\SERIALCOMM"
 
@@ -150,19 +144,19 @@ BOOL set_layout(HWND hwnd) {
 	int radio1_width;
 	int radio2_width;
 	int radio3_width;
-	int	radio4_width;
+//	int	radio4_width;
 	int space_width;
-	int space_height;
+//	int space_height;
 
 	CString s;
 	RECT mian_windiw_pos;
 	RECT radio1_pos;
 	RECT radio2_pos;
-	RECT clear_pos;
+//	RECT clear_pos;
 	RECT radio3_pos;
-	RECT radio4_pos;
-	RECT clear_send_pos;
-	RECT send_pos;
+//	RECT radio4_pos;
+//	RECT clear_send_pos;
+//	RECT send_pos;
 	RECT comm_open_pos;
 
 	RECT rich_edit_pos1;
@@ -352,7 +346,7 @@ BOOL set_layout(HWND hwnd) {
 
 	//MessageBox(hwnd, s, TEXT("Error"), MB_OK);
 	//	MoveWindow(hwnd_static_receive, left, top,  width, height, TRUE);
-
+	return TRUE;
 }
 
 

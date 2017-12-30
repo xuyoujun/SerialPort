@@ -1,11 +1,4 @@
 #include "stdafx.h"
-#include <windows.h>
-#include <windowsx.h>
-#include "resource.h"
-#include "SerialPort.h"
-#include <commdlg.h>
-#include "common.h"
-#include "format_data.h"
 
 extern HWND main_hwnd;
 DWORD WINAPI Receive_Serial_Port_Thread(LPVOID lpParam)//用于读线程的函数

@@ -1,9 +1,4 @@
 #include "stdafx.h"
-#include <windows.h>
-#include <windowsx.h>
-#include "resource.h"
-#include "SerialPort.h"
-#include <commdlg.h>
 
 BOOL Close_Serial_Port(HWND hwnd, HANDLE com_handler) {
 	BOOL close_flag = false;

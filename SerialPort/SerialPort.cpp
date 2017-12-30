@@ -1,22 +1,19 @@
 #include "stdafx.h"
-#include <windows.h>
-#include <windowsx.h>
-#include "resource.h"
-#include "SerialPort.h"
-#include <commdlg.h>
 
-#include "open_comm.h"
-#include "close_comm.h"
-#include "set_comm.h"
-#include "send_data.h"
-#include "receive_data.h"
-#include "set_layout.h"
-
-#include <atlstr.h>
 
 
 static HANDLE com_handler = INVALID_HANDLE_VALUE;//串口句柄
 HWND   main_hwnd;// = { 0 };//
+
+int APIENTRY _tWinMain(HINSTANCE hInstance,
+	HINSTANCE hPrevInstance,
+	LPTSTR    lpCmdLine,
+	int       nCmdShow)
+{
+	LoadLibrary("riched20.dll");
+	DialogBox(hInstance, MAKEINTRESOURCE(IDD_MAIN), NULL, Main_Proc);
+	return 0;
+}
 
 BOOL WINAPI Main_Proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -59,14 +56,15 @@ void Main_OnCommand(HWND hwnd, int command, HWND hwndCtl, UINT codeNotify)
 			break;
 
 		case IDC_SEND:
-
 			Send_Serial_Port(hwnd, com_handler);
 			break;
+
 		case ID_FRESH:
 			fresh_serial_port(hwnd);
 			break;
+
 		case IDC_CLEAR_RECEIVE:
-			SetDlgItemText(hwnd,IDC_RICHEDIT22,NULL);//清空接收区
+			SetDlgItemText(hwnd, IDC_RICHEDIT22, NULL);//清空接收区
 			break;
 
 		case IDC_CLEAR_SEND:

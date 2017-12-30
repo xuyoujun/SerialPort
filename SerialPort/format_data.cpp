@@ -1,8 +1,5 @@
 #include "stdafx.h"
-#include <windows.h>
-#include <windowsx.h>
-#include "resource.h"
-#include "common.h"
+
 BOOL convent_to_hex(TCHAR *buffer, DWORD len) {
 
 	DWORD i = 0;
