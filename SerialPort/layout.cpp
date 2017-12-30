@@ -78,8 +78,11 @@ static BOOL set_candidate_stop_bit(HWND hwnd) {
 static BOOL set_candidate_check_bit(HWND hwnd) {
 
 	HWND hwnd_check_bit = GetDlgItem(hwnd, IDC_COMBO3);//校检位
-													   //EVENPARITY 偶校验     NOPARITY 无校验
-													   //MARKPARITY 标记校验   ODDPARITY 奇校验
+
+	/*
+	EVENPARITY 偶校验     NOPARITY 无校验
+	MARKPARITY 标记校验   ODDPARITY 奇校验
+	*/
 	ComboBox_InsertString(hwnd_check_bit, -1, "NOPARITY");
 	ComboBox_InsertString(hwnd_check_bit, -1, "ODDPARITY");
 	ComboBox_InsertString(hwnd_check_bit, -1, "EVENPARITY");
@@ -90,9 +93,9 @@ static BOOL set_candidate_check_bit(HWND hwnd) {
 
 static BOOL set_candidate_data_format(HWND hwnd) {
 
-	HWND receiveHex = GetDlgItem(hwnd, IDC_RADIO1);//接收_得到16进制的按钮句柄
+	HWND receiveHex = GetDlgItem(hwnd, IDC_RADIO2);//接收_得到16进制的按钮句柄
 	Button_SetCheck(receiveHex, 1);//设置默认选项
-	HWND sendHex = GetDlgItem(hwnd, IDC_RADIO3);//发送_得到16进制的按钮句柄
+	HWND sendHex = GetDlgItem(hwnd, IDC_RADIO4);//发送_得到16进制的按钮句柄
 	Button_SetCheck(sendHex, 1);//设置默认选项
 	return TRUE;
 }
@@ -260,7 +263,7 @@ BOOL set_layout(HWND hwnd) {
 
 																				//radio1
 	temp_height = (receive_height - GAP) * HEIGHT_RECEIVE_AREA_CONTROL_PORTION / HEIGHT_RECEIVE_AREA_TOTOAL_PORTION;
-	temp_top = receive_top + GAP + (receive_height - GAP) * HEIGHT_RECEIVE_AREA_EDITOR_PORTION / HEIGHT_RECEIVE_AREA_TOTOAL_PORTION + temp_height * 1 / 10;
+	temp_top = receive_top + GAP  + (receive_height - GAP) * HEIGHT_RECEIVE_AREA_EDITOR_PORTION / HEIGHT_RECEIVE_AREA_TOTOAL_PORTION + temp_height * 1 / 10;
 
 	MoveWindow(hwnd_radio1, temp_left, temp_top, radio1_width, temp_height * 8 / 10, TRUE);
 
@@ -326,7 +329,7 @@ BOOL set_layout(HWND hwnd) {
 	MoveWindow(hwnd_send, temp_left, temp_top, temp_width, temp_height * 8 / 10, TRUE);
 
 	//radio4
-	temp_top = send_top + GAP + (send_height - GAP) * (HEIGHT_SEND_AREA_EDITOR_PORTION + HEIGHT_SEND_AREA_CONTROL1_PORTION) / HEIGHT_SEND_AREA_TOTOAL_PORTION + temp_height * 0.1;
+	temp_top = send_top + GAP + (send_height - GAP) * (HEIGHT_SEND_AREA_EDITOR_PORTION + HEIGHT_SEND_AREA_CONTROL1_PORTION) / HEIGHT_SEND_AREA_TOTOAL_PORTION + temp_height /10;
 	temp_left = send_left + GAP;
 	temp_width = send_width - 2 * GAP;
 	MoveWindow(hwnd_radio4, temp_left, temp_top, radio3_width, temp_height * 8 / 10, TRUE);
@@ -373,7 +376,6 @@ BOOL fresh_serial_port(HWND hwnd) {
 	INT index = 0;
 	HWND hwnd_sel;
 	TCHAR comm_name[COMM_NAME_LEN];
-
 
 	ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, REG_FILE, 0, KEY_READ, &hkey);
 	if (ERROR_SUCCESS != ret) {

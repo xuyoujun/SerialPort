@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 
-BOOL Set_Serial_Port(HWND hwnd, HANDLE com_handler) {
+BOOL set_serial_port(HWND hwnd, HANDLE com_handler) {
 	HWND hwnd_close;// = GetDlgItem(hwnd, ID_OPEN);//隐蔽打开串口按钮
 
 	HWND hwnd_open;// IDCLOSE = GetDlgItem(hwnd, ID_CLOSE);//解除对关闭串口按钮的隐蔽
@@ -72,7 +72,7 @@ BOOL Set_Serial_Port(HWND hwnd, HANDLE com_handler) {
 	//SetCommMask(com_handler,);
 
 	/* Create a thread to receive data */
-	CreateThread(NULL, 0, Receive_Serial_Port_Thread, com_handler, 0, 0);//开始读线程
+	CreateThread(NULL, 0, receive_serial_port_thread, com_handler, 0, 0);//开始读线程
 	return true;
 }
 

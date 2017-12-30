@@ -1,2 +1,2 @@
 #pragma once
-BOOL Set_Serial_Port(HWND hwnd, HANDLE com_handler);
+BOOL set_serial_port(HWND hwnd, HANDLE com_handler);

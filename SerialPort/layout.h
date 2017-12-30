@@ -1,13 +1,13 @@
 #pragma once
-#define GAP                                   (20)
-#define BORDER_GAP                            (30)
+#define GAP                                   (15)
+#define BORDER_GAP                            (10)
 #define SEND_EDITOR_HEIGHT                    (40)
 
 
-#define HEIGHT_TOTAL_PORTION                  (11)
-#define HEIGHT_RECEIVE_PORTION                (7)
+#define HEIGHT_TOTAL_PORTION                  (23)
+#define HEIGHT_RECEIVE_PORTION                (16)
 #define HEIGHT_GAP_PORTION                    (1)
-#define HEIGHT_SEND_PORTION                   (3)
+#define HEIGHT_SEND_PORTION                   (6)
 
 #define HEIGHT_RECEIVE_AREA_TOTOAL_PORTION    (9)
 #define HEIGHT_RECEIVE_AREA_EDITOR_PORTION    (8)

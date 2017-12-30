@@ -12,6 +12,4 @@ BOOL Main_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam);
 void Main_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify);
 void Main_OnSize(HWND hwnd, UINT state, INT cx, INT cy);
 void Main_OnClose(HWND hwnd);
-DWORD WINAPI Receive_Serial_Port_Thread( LPVOID lpParam );
-
 #endif

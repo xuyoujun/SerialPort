@@ -1,26 +1,25 @@
 #include "stdafx.h"
 
-
-static BOOL get_comm_name(TCHAR *pname,INT len,HWND hwnd) {
-	HWND  hwnd_comm; //获得串口组件的句柄
+static BOOL format_sp_name(TCHAR *sp_name,INT len,HWND hwnd) {
+	HWND  hwnd_sp; //获得串口组件的句柄
 	INT index = 0;
-	*pname++ = '\\';
-	*pname++ = '\\';
-	*pname++ = '.';
-	*pname++ = '\\';
-	hwnd_comm = GetDlgItem(hwnd, IDC_COMBOSERIAL);//获得串口组件的句柄
-	index = ComboBox_GetCurSel(hwnd_comm);//得到串口组件现在的选项的索引值
-	ComboBox_GetLBText(hwnd_comm, index, pname);//得到索引值的内容
+	*sp_name++ = '\\';
+	*sp_name++ = '\\';
+	*sp_name++ = '.';
+	*sp_name++ = '\\';
+	hwnd_sp = GetDlgItem(hwnd, IDC_COMBOSERIAL);//获得串口组件的句柄
+	index   = ComboBox_GetCurSel(hwnd_sp);//得到串口组件现在的选项的索引值
+	ComboBox_GetLBText(hwnd_sp, index, sp_name);//得到索引值的内容
 	return TRUE;
 }
 
-HANDLE Open_Serial_Port(HWND hwnd) {
-//	INT   index;
-	HANDLE hCom;  //串口句柄
-	TCHAR comm_name[COMM_NAME_LEN] = {0};
+HANDLE open_serial_port(HWND hwnd) {
+	HANDLE sp_hdr;  /* serial port handler */
 	CString str;
-	get_comm_name(comm_name, sizeof(comm_name), hwnd);
-	hCom = CreateFile(comm_name,  //COM口
+	TCHAR sp_name[COMM_NAME_LEN] = { 0 };
+
+	format_sp_name(sp_name, sizeof(sp_name), hwnd);
+	sp_hdr = CreateFile(sp_name,      /* serial port name */
 		GENERIC_READ | GENERIC_WRITE, //允许读和写
 		0,  //独占方式
 		NULL,
@@ -29,9 +28,9 @@ HANDLE Open_Serial_Port(HWND hwnd) {
 		NULL
 		);
 
-	if (INVALID_HANDLE_VALUE == hCom) {
-		str.Format(_T("打开%s失败!"),comm_name + strlen("\\\\.\\"));
-		MessageBox(NULL,str, TEXT("Error"), NULL);
+	if (INVALID_HANDLE_VALUE == sp_hdr) {
+		str.Format(_T("Open %s is failure!"), sp_name + strlen("\\\\.\\"));
+		MessageBox(NULL, str, TEXT("Error"), MB_OK);
 	}
-	return hCom;
+	return sp_hdr;
 }
