@@ -1,78 +1,105 @@
 #include "stdafx.h"
 
+static void set_hide_close_show_open(HWND hwnd) {
 
-BOOL set_serial_port(HWND hwnd, HANDLE com_handler) {
 	HWND hwnd_close;// = GetDlgItem(hwnd, ID_OPEN);//隐蔽打开串口按钮
-
 	HWND hwnd_open;// IDCLOSE = GetDlgItem(hwnd, ID_CLOSE);//解除对关闭串口按钮的隐蔽
-	//ShowWindow(hwndIDCLOSE,SW_SHOW);
-	HWND hwnd_data_bit;  //数据位 handler
-	HWND hwnd_baud_rate; //波特率 handler
-	HWND hwnd_check_bit; //校验位 handler
-	HWND hwnd_stop_bit;  //停止位 handler
-	TCHAR buffer[10] = { 0 };
-	INT   index = 0;
-	DCB   dcb;
-	COMMTIMEOUTS TimeOuts;
-
-	if (INVALID_HANDLE_VALUE == com_handler) {
-		return FALSE;
-	}
-
 	hwnd_open = GetDlgItem(hwnd, ID_OPEN);//隐蔽打开串口按钮
 	EnableWindow(hwnd_open, FALSE);
 	hwnd_close = GetDlgItem(hwnd, ID_CLOSE);//解除对关闭串口按钮的隐蔽
 	EnableWindow(hwnd_close, TRUE);
-
-	SetupComm(com_handler, MAX_BUFFER_SIZE, MAX_BUFFER_SIZE); //输入缓冲区和输出缓冲区的大小都是1024
-
-	TimeOuts.ReadIntervalTimeout = 1000;//设定读超时
-	TimeOuts.ReadTotalTimeoutMultiplier = 500;
-	TimeOuts.ReadTotalTimeoutConstant = 5000;
-
-	TimeOuts.WriteTotalTimeoutMultiplier = 500;//设定写超时
-	TimeOuts.WriteTotalTimeoutConstant = 2000;
-	SetCommTimeouts(com_handler, &TimeOuts);    //设置超时
-
-												/* Get current comm port state */
-	GetCommState(com_handler, &dcb);
-	dcb.DCBlength = sizeof(dcb);
-
-	/* Get data bit config */
-	ZeroMemory(buffer, sizeof(buffer));
-	hwnd_data_bit = GetDlgItem(hwnd, IDC_DATA_BIT);
-	index = ComboBox_GetCurSel(hwnd_data_bit);//得到现在的选项的索引值
-	ComboBox_GetLBText(hwnd_data_bit, index, buffer);//得到索引值的内容
-	dcb.ByteSize = atoi(buffer);    //每个字节有8位
-
-									/* Get stop bit config */
-	ZeroMemory(buffer, sizeof(buffer));
-	hwnd_stop_bit = GetDlgItem(hwnd, IDC_STOP_BIT);
-	index = ComboBox_GetCurSel(hwnd_stop_bit);//得到现在的选项的索引值
-	ComboBox_GetLBText(hwnd_stop_bit, index, buffer);//得到索引值的内容
-	dcb.StopBits = atoi(buffer) - 1; //停止位
-
-									 /* Get boud rate config */
-	ZeroMemory(buffer, sizeof(buffer));
-	hwnd_baud_rate = GetDlgItem(hwnd, IDC_BOUD_RATE);//设置波特率
-	index = ComboBox_GetCurSel(hwnd_baud_rate);
-	ComboBox_GetLBText(hwnd_baud_rate, index, buffer);
-	dcb.BaudRate = atoi(buffer);       //波特率
-
-									   /*Get check bit config*/
-	ZeroMemory(buffer, sizeof(buffer));
-	hwnd_check_bit = GetDlgItem(hwnd, IDC_CHECK_BIT);//设置校检位
-	index = ComboBox_GetCurSel(hwnd_check_bit);
-	ComboBox_GetLBText(hwnd_check_bit, index, buffer);
-	dcb.Parity = *buffer; //有无奇偶校验位
-
-						  /* Set current comm port state */
-	SetCommState(com_handler, &dcb);
-	//PurgeComm(com_handler,PURGE_TXCLEAR|PURGE_RXCLEAR);
-	//SetCommMask(com_handler,);
-
-	/* Create a thread to receive data */
-	CreateThread(NULL, 0, receive_serial_port_thread, com_handler, 0, 0);//开始读线程
-	return true;
 }
 
+static void set_timeout(HANDLE sp_hdr,COMMTIMEOUTS *timeout) {
+	if (NULL == timeout) {
+		return;
+	}
+
+	timeout->ReadIntervalTimeout = 1000;//设定读超时
+	timeout->ReadTotalTimeoutMultiplier = 500;
+	timeout->ReadTotalTimeoutConstant = 5000;
+	timeout->WriteTotalTimeoutMultiplier = 500;//设定写超时
+	timeout->WriteTotalTimeoutConstant = 2000;
+	SetCommTimeouts(sp_hdr, timeout);    //设置超时
+}
+
+INT get_data_bit(HWND hwnd) {
+	INT i;
+	HWND hwnd_db;  //数据位 handler
+	TCHAR buffer[32] = {0};
+
+	hwnd_db = GetDlgItem(hwnd, IDC_DATA_BIT);
+	i = ComboBox_GetCurSel(hwnd_db);//得到现在的选项的索引值
+	ComboBox_GetLBText(hwnd_db, i, buffer);//得到索引值的内容
+	return  atoi(buffer);    //每个字节有8位
+}
+
+INT get_stop_bit(HWND hwnd) {
+	INT   ret;
+	HWND  hwnd_sb;  //停止位 handler
+	TCHAR buffer[32] = { 0 };
+
+	hwnd_sb = GetDlgItem(hwnd, IDC_STOP_BIT);
+	ret = ComboBox_GetCurSel(hwnd_sb);//得到现在的选项的索引值
+	ComboBox_GetLBText(hwnd_sb, ret, buffer);//得到索引值的内容
+	return  atoi(buffer);    //每个字节有8位
+}
+
+INT get_boud_rate(HWND hwnd) {
+	INT   ret;
+	HWND  hwnd_br;  //停止位 handler
+	TCHAR buffer[32] = { 0 };
+
+	hwnd_br = GetDlgItem(hwnd, IDC_BOUD_RATE);//设置波特率
+	ret = ComboBox_GetCurSel(hwnd_br);
+	ComboBox_GetLBText(hwnd_br, ret, buffer);
+	return atoi(buffer);       //波特率
+}
+
+
+void get_check_bit(HWND hwnd, TCHAR *buffer) {
+	HWND hwnd_cb;
+	INT ret;
+	if (NULL == buffer) {
+		return;
+	}
+	ZeroMemory(buffer, sizeof(buffer));
+	hwnd_cb = GetDlgItem(hwnd, IDC_CHECK_BIT);//设置校检位
+	ret = ComboBox_GetCurSel(hwnd_cb);
+	ComboBox_GetLBText(hwnd_cb, ret, buffer);
+}
+
+BOOL set_serial_port(HWND hwnd, HANDLE sp_hdr) {
+	
+	DCB   dcb;
+	TCHAR buffer[10] = { 0 };
+	COMMTIMEOUTS TimeOuts;
+
+	if (INVALID_HANDLE_VALUE == sp_hdr) {
+		return FALSE;
+	}
+
+	/*set the buffer's size of receive and send*/
+	SetupComm(sp_hdr, RECEIVE_BUFFER_SIZE, SEND_BUFFER_SIZE);
+	set_timeout(sp_hdr, &TimeOuts);
+	
+	/* Get current serial port state */
+	GetCommState(sp_hdr, &dcb);
+	dcb.DCBlength = sizeof(dcb);
+	dcb.ByteSize = get_data_bit(hwnd);
+	dcb.StopBits = get_stop_bit(hwnd);
+	dcb.BaudRate = get_boud_rate(hwnd); 
+	get_check_bit(hwnd, buffer);
+	dcb.Parity = *buffer;
+	/* Set current serial port state */
+	SetCommState(sp_hdr, &dcb);
+
+	/*clear receive and send buffer*/
+	PurgeComm(sp_hdr,PURGE_TXCLEAR|PURGE_RXCLEAR);
+	//SetCommMask(com_handler,);
+	/* Create a thread to receive data */
+	CreateThread(NULL, 0, receive_serial_port_thread, sp_hdr, 0, 0);//开始读线程
+	/* hide the open botton */
+	set_hide_close_show_open(hwnd);
+	return true;
+}
