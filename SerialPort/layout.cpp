@@ -23,7 +23,7 @@ static BOOL set_candidate_comm_name(HWND hwnd) {
 	BOOL ret = FALSE;
 	HKEY hkey = NULL;
 	BYTE comm_name[COMM_NAME_LEN] = { 0 };
-	hwnd_sel = GetDlgItem(hwnd, IDC_COMBOSERIAL);//添加串口选项
+	hwnd_sel = GetDlgItem(hwnd, IDC_COMBOSERIAL);
 	ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, REG_FILE, 0, KEY_READ, &hkey);
 	if (ERROR_SUCCESS != ret) {
 		return FALSE;
@@ -46,7 +46,7 @@ static BOOL set_candidate_boud_rate(HWND hwnd) {
 	TCHAR  buffer[MAX_BOUD_BUFFER];
 	UINT32 boud_rate[] = { 600,	1200,	2400,	4800,	9600,	19200,
 		38400,	56000,	57600,	115200,	128000,	256000,	1440000 };
-	hwnd_boud_sel = GetDlgItem(hwnd, IDC_COMBOBOUDRATE);//添加波特率选项
+	hwnd_boud_sel = GetDlgItem(hwnd, IDC_COMBOBOUDRATE);
 	for (i = 0; i < sizeof(boud_rate) / sizeof(boud_rate[0]); i++) {
 		itoa(boud_rate[i], buffer, 10);
 		ComboBox_InsertString(hwnd_boud_sel, -1, buffer);

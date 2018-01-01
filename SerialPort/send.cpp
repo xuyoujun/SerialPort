@@ -4,14 +4,14 @@
 static BOOL get_data_form_editor(HWND hwnd, TCHAR *buffer) {
 	INT   data_format;
 	HWND  hwnd_hex;
-	DWORD len = MAX_BUFFER_SIZE;         //要写入数据的字节
-	hwnd_hex = GetDlgItem(hwnd, IDC_RADIO3);//发送_得到16进制的按钮句柄
-	data_format = Button_GetCheck(hwnd_hex);//得到句柄的状态
+	DWORD len = MAX_BUFFER_SIZE;
+	hwnd_hex = GetDlgItem(hwnd, IDC_RADIO3);
+	data_format = Button_GetCheck(hwnd_hex);
 
-	GetDlgItemText(hwnd, IDC_EDIT2, buffer, MAX_BUFFER_SIZE);//得到要写入的数据
-	len = strlen(buffer);  //要写入数据的长度
+	GetDlgItemText(hwnd, IDC_EDIT2, buffer, MAX_BUFFER_SIZE);
+	len = strlen(buffer);
 	
-	if (1 == data_format) {//发送16进制数据
+	if (HEX_DATA == data_format) {
 		 return convent_to_hex(buffer, len);
 	}
 	return TRUE;
@@ -19,10 +19,10 @@ static BOOL get_data_form_editor(HWND hwnd, TCHAR *buffer) {
 
 BOOL send_serial_port(HWND hwnd, HANDLE sp_hdr) {
 
-	BOOL  ret = FALSE;//是否有非法字符的标志
-	BOOL  wr_stat = FALSE;//用于判断写入是否成功
+	BOOL  ret = FALSE;
+	BOOL  wr_stat = FALSE;
 	DWORD len = MAX_BUFFER_SIZE;
-	TCHAR buffer[MAX_BUFFER_SIZE];//准备写入的数据
+	TCHAR buffer[MAX_BUFFER_SIZE];
 	OVERLAPPED asy_io;
 
 	if (sp_hdr == INVALID_HANDLE_VALUE) {
@@ -30,7 +30,7 @@ BOOL send_serial_port(HWND hwnd, HANDLE sp_hdr) {
 		return ret;
 	}
 		
-	PurgeComm(sp_hdr, PURGE_TXCLEAR);//清空写缓冲区
+	PurgeComm(sp_hdr, PURGE_TXCLEAR);
 	ZeroMemory(buffer, sizeof(buffer));
 	ret = get_data_form_editor(hwnd, buffer);
 	

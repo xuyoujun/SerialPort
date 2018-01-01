@@ -1,15 +1,15 @@
 #include "stdafx.h"
 
 static BOOL format_sp_name(TCHAR *sp_name,INT len,HWND hwnd) {
-	HWND  hwnd_sp; //获得串口组件的句柄
+	HWND  hwnd_sp;
 	INT index = 0;
 	*sp_name++ = '\\';
 	*sp_name++ = '\\';
 	*sp_name++ = '.';
 	*sp_name++ = '\\';
-	hwnd_sp = GetDlgItem(hwnd, IDC_COMBOSERIAL);//获得串口组件的句柄
-	index   = ComboBox_GetCurSel(hwnd_sp);//得到串口组件现在的选项的索引值
-	ComboBox_GetLBText(hwnd_sp, index, sp_name);//得到索引值的内容
+	hwnd_sp = GetDlgItem(hwnd, IDC_COMBOSERIAL);
+	index   = ComboBox_GetCurSel(hwnd_sp);
+	ComboBox_GetLBText(hwnd_sp, index, sp_name);
 	return TRUE;
 }
 
@@ -20,11 +20,11 @@ HANDLE open_serial_port(HWND hwnd) {
 
 	format_sp_name(sp_name, sizeof(sp_name), hwnd);
 	sp_hdr = CreateFile(sp_name,      /* serial port name */
-		GENERIC_READ | GENERIC_WRITE, //允许读和写
-		0,  //独占方式
+		GENERIC_READ | GENERIC_WRITE, /* read and writ */
+		0,                            /* show mode. 0:exclusive 1:share*/
 		NULL,
-		OPEN_EXISTING,  //打开而不是创建
-		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, //重叠方式
+		OPEN_EXISTING,                /* the file must exist */
+		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, /* overlapped style */
 		NULL
 		);
 

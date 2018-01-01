@@ -3,7 +3,7 @@
 
 
 static HANDLE com_handler = INVALID_HANDLE_VALUE;//串口句柄
-HWND   main_hwnd;// = { 0 };//
+HWND   main_hwnd;
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -32,8 +32,8 @@ BOOL WINAPI Main_Proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 BOOL Main_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
 	HWND hwnd_close;
-	hwnd_close = GetDlgItem(hwnd, ID_CLOSE);//获得关闭按钮的句柄
-	EnableWindow(hwnd_close,FALSE);         //先隐蔽关闭串口选项
+	hwnd_close = GetDlgItem(hwnd, ID_CLOSE);
+	EnableWindow(hwnd_close,FALSE);
 	init_layout(hwnd);
 	return TRUE;
 }

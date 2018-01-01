@@ -9,13 +9,13 @@ BOOL convent_to_hex(TCHAR *p, DWORD len) {
 	}
 
 	for (i = 0; i < len; p++,i++) {
-		if ('0' <= *p && *p <= '9') {//对0-9之间的数字进行转换
+		if ('0' <= *p && *p <= '9') {
 			*p = *p - '0';
 		}
-		else if ('A' <= *p && *p <= 'F') {//对A-F之间的数据进行转换
+		else if ('A' <= *p && *p <= 'F') {
 			*p = *p - 'A' + 10;
 		}
-		else if ('a' <= *p && *p <= 'f') {//对a-f之间的数据进行转换	
+		else if ('a' <= *p && *p <= 'f') {
 			*p = *p - 'a' + 10;
 		}
 		else {//对有非法字符进行标记

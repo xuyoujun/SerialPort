@@ -2,11 +2,11 @@
 
 static void set_hide_close_show_open(HWND hwnd) {
 
-	HWND hwnd_close;// = GetDlgItem(hwnd, ID_OPEN);//隐蔽打开串口按钮
-	HWND hwnd_open;// IDCLOSE = GetDlgItem(hwnd, ID_CLOSE);//解除对关闭串口按钮的隐蔽
-	hwnd_open = GetDlgItem(hwnd, ID_OPEN);//隐蔽打开串口按钮
+	HWND hwnd_close;
+	HWND hwnd_open;
+	hwnd_open = GetDlgItem(hwnd, ID_OPEN);
 	EnableWindow(hwnd_open, FALSE);
-	hwnd_close = GetDlgItem(hwnd, ID_CLOSE);//解除对关闭串口按钮的隐蔽
+	hwnd_close = GetDlgItem(hwnd, ID_CLOSE);
 	EnableWindow(hwnd_close, TRUE);
 }
 
@@ -25,13 +25,13 @@ static void set_timeout(HANDLE sp_hdr,COMMTIMEOUTS *timeout) {
 
 INT get_data_bit(HWND hwnd) {
 	INT i;
-	HWND hwnd_db;  //数据位 handler
+	HWND hwnd_db;
 	TCHAR buffer[32] = {0};
 
 	hwnd_db = GetDlgItem(hwnd, IDC_DATA_BIT);
-	i = ComboBox_GetCurSel(hwnd_db);//得到现在的选项的索引值
-	ComboBox_GetLBText(hwnd_db, i, buffer);//得到索引值的内容
-	return  atoi(buffer);    //每个字节有8位
+	i = ComboBox_GetCurSel(hwnd_db);
+	ComboBox_GetLBText(hwnd_db, i, buffer);
+	return  atoi(buffer);
 }
 
 INT get_stop_bit(HWND hwnd) {
@@ -40,31 +40,31 @@ INT get_stop_bit(HWND hwnd) {
 	TCHAR buffer[32] = { 0 };
 
 	hwnd_sb = GetDlgItem(hwnd, IDC_STOP_BIT);
-	ret = ComboBox_GetCurSel(hwnd_sb);//得到现在的选项的索引值
-	ComboBox_GetLBText(hwnd_sb, ret, buffer);//得到索引值的内容
-	return  atoi(buffer);    //每个字节有8位
+	ret = ComboBox_GetCurSel(hwnd_sb);
+	ComboBox_GetLBText(hwnd_sb, ret, buffer);
+	return  atoi(buffer);
 }
 
 INT get_boud_rate(HWND hwnd) {
 	INT   ret;
-	HWND  hwnd_br;  //停止位 handler
+	HWND  hwnd_br;
 	TCHAR buffer[32] = { 0 };
 
-	hwnd_br = GetDlgItem(hwnd, IDC_BOUD_RATE);//设置波特率
+	hwnd_br = GetDlgItem(hwnd, IDC_BOUD_RATE);
 	ret = ComboBox_GetCurSel(hwnd_br);
 	ComboBox_GetLBText(hwnd_br, ret, buffer);
-	return atoi(buffer);       //波特率
+	return atoi(buffer);
 }
 
 
 void get_check_bit(HWND hwnd, TCHAR *buffer) {
-	HWND hwnd_cb;
 	INT ret;
+	HWND hwnd_cb;
 	if (NULL == buffer) {
 		return;
 	}
 	ZeroMemory(buffer, sizeof(buffer));
-	hwnd_cb = GetDlgItem(hwnd, IDC_CHECK_BIT);//设置校检位
+	hwnd_cb = GetDlgItem(hwnd, IDC_CHECK_BIT);
 	ret = ComboBox_GetCurSel(hwnd_cb);
 	ComboBox_GetLBText(hwnd_cb, ret, buffer);
 }
