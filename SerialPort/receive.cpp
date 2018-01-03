@@ -39,24 +39,24 @@ DWORD WINAPI receive_serial_port_thread(LPVOID lpParam)//用于读线程的函数
 	DWORD      len = MAX_BUFFER_SIZE;
 
 	sp_hdr      = (HANDLE)lpParam;
+	ZeroMemory(&asy_io, sizeof(asy_io));
+	ZeroMemory(buffer , sizeof(buffer));
 	hwnd_editor = GetDlgItem(main_hwnd, IDC_RICHEDIT22);
 
 	while (1) {
+		len = MAX_BUFFER_SIZE;
 		asy_io.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-		ZeroMemory(&asy_io, sizeof(asy_io));
-		ZeroMemory(buffer, sizeof(buffer));
 		ClearCommError(sp_hdr, &err_type, &sp_stat);
 
-		len = sp_stat.cbInQue;
-
 		/* none in buffer; Maybe can Sleep(30);*/
-		if (0 == len) {
+		if (0 == sp_stat.cbInQue) {
+			CloseHandle(asy_io.hEvent);
 			continue;
 		}
 
-		/* there is data in buffer，0！=ComStat.cbInQue */
+		/* Data  is in buffer，0！=ComStat.cbInQue */
 		rd_stat = ReadFile(sp_hdr, buffer, len, &len, &asy_io);
-			
+
 		if (FALSE == rd_stat && (ERROR_IO_PENDING == GetLastError())) {
 			GetOverlappedResult(sp_hdr, &asy_io, &len, TRUE);
 		}
@@ -64,6 +64,8 @@ DWORD WINAPI receive_serial_port_thread(LPVOID lpParam)//用于读线程的函数
 		insert_to_editor(buffer, hwnd_editor);
 		PurgeComm(sp_hdr, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
 		CloseHandle(asy_io.hEvent);
+		ZeroMemory(&asy_io, sizeof(asy_io));
+		ZeroMemory(buffer, sizeof(buffer));
 	}
 	return 0;
 }

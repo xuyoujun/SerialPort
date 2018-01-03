@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-
-
 static HANDLE com_handler = INVALID_HANDLE_VALUE;//´®¿Ú¾ä±ú
 HWND   main_hwnd;
 
@@ -27,7 +25,6 @@ BOOL WINAPI Main_Proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	main_hwnd = hWnd;
     return FALSE;
 }
-
 
 BOOL Main_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
