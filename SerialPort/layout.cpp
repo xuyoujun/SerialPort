@@ -14,6 +14,7 @@ static BOOL get_comm_name(TCHAR * buffer, HKEY hkey, UINT index) {
 	if (ERROR_NO_MORE_ITEMS == RegEnumValue(hkey, index, portname, &dwlong, NULL, NULL, (PUCHAR)buffer, &dwsize)) {
 		return FALSE;
 	}
+	//MessageBox(NULL, portname, TEXT("Error"), MB_OK);
 	return TRUE;
 }
 
@@ -381,7 +382,7 @@ BOOL fresh_serial_port(HWND hwnd) {
 	if (ERROR_SUCCESS != ret) {
 		return FALSE;
 	}
-	hwnd_sel = GetDlgItem(hwnd, IDC_COMBOSERIAL);//添加串口选项
+	hwnd_sel = GetDlgItem(hwnd, IDC_COMBOSERIAL);
 	
 	// clear the content of hwnd_sel
 	SendMessage(hwnd_sel, CB_RESETCONTENT, 0, 0);

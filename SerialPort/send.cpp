@@ -28,12 +28,19 @@ BOOL send_serial_port(HWND hwnd, HANDLE sp_hdr) {
 	OVERLAPPED asy_io;
 
 	if (sp_hdr == INVALID_HANDLE_VALUE) {
-		MessageBox(hwnd, TEXT("No serial port is opened."), TEXT("Error"), MB_OK);
+		MessageBox(hwnd, "No serial port is opened.", TEXT("Error"), MB_OK);
 		return ret;
 	}
-		
+	
+	asy_io.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	if (FALSE == asy_io.hEvent) {
+		MessageBox(NULL, "Create send event!", TEXT("Error"), MB_OK);
+	}
+
 	PurgeComm(sp_hdr, PURGE_TXCLEAR);
 	ZeroMemory(buffer, sizeof(buffer));
+
 	len = get_data_form_editor(hwnd, buffer);
 	
 	if (0 == len) {
@@ -41,16 +48,14 @@ BOOL send_serial_port(HWND hwnd, HANDLE sp_hdr) {
 		return ret;
 	}
 	/* Event is used to sync */
-	asy_io.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-	/* If the write operation is not done, 	
-	 * the event will*/
+
 	wr_stat = WriteFile(sp_hdr, buffer, len, &len, &asy_io);
 	
 	if (FALSE == wr_stat){
 		if (ERROR_IO_PENDING == GetLastError()) {
-			WaitForSingleObject(asy_io.hEvent, 500);
-			GetOverlappedResult(sp_hdr, &asy_io, &len, FALSE);
+			//WaitForSingleObject(asy_io.hEvent, 500);
+			GetOverlappedResult(sp_hdr, &asy_io, &len, TRUE);
 		}
 		else {
 			MessageBox(NULL, "Send data get trouble!", TEXT("Error"), MB_OK);

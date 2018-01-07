@@ -38,60 +38,53 @@ DWORD WINAPI receive_serial_port_thread(LPVOID lpParam)//用于读线程的函数
 	OVERLAPPED asy_io;
 	TCHAR      buffer[MAX_BUFFER_SIZE];
 	DWORD      len = MAX_BUFFER_SIZE;
-
+	DWORD      read_num;
 	sp_hdr      = (HANDLE)lpParam;
+
 	ZeroMemory(&asy_io, sizeof(asy_io));
 	ZeroMemory(buffer , sizeof(buffer));
 	hwnd_editor = GetDlgItem(main_hwnd, IDC_RICHEDIT22);
 	asy_io.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	if (FALSE == asy_io.hEvent) {
-		MessageBox(NULL, "Error: can't create receive event!", TEXT("Error"), MB_OK);
+		MessageBox(NULL, "Error:Create event!", TEXT("Error"), MB_OK);
 		return 0;
 	}
 
-	while (1) {
-
+	while (TRUE) {
 		ZeroMemory(buffer, sizeof(buffer));
 
 		rd_stat = WaitCommEvent(sp_hdr, &mask_type, &asy_io);
 		if (FALSE == rd_stat) {
 			if (ERROR_IO_PENDING == GetLastError()) {
 				GetOverlappedResult(sp_hdr, &asy_io, &len, TRUE);
-			//	MessageBox(NULL, "xx!", TEXT("Error"), MB_OK);
 			}
 		}
+
+		/* Waiting the data is transfered completely */
+		Sleep(1);
 
 		ClearCommError(sp_hdr, &err_type, &sp_stat);
 
 		len = sp_stat.cbInQue;
 		if (0 == len) {
-		//	MessageBox(NULL, "xx!", TEXT("Error"), MB_OK);
 			continue;
 		}
 
 		/* Not receive event */
-		if (!(mask_type & EV_RXCHAR)) {
+		if (EV_RXCHAR != (mask_type & EV_RXCHAR)) {
 			continue;
 		}
 
-		rd_stat = ReadFile(sp_hdr, buffer, len, &len, &asy_io);
+		rd_stat = ReadFile(sp_hdr, buffer, len , &read_num, &asy_io);
 
 		if (FALSE == rd_stat){
 			break;
-			//MessageBox(NULL, "uu!", TEXT("Error"), MB_OK);
-			/*if (ERROR_IO_PENDING == GetLastError()) {
-				GetOverlappedResult(sp_hdr, &asy_io, &len, TRUE);
-				if (0 == len) {
-					continue;
-				}
-			}*/
 		}
 
 		insert_to_editor(buffer, hwnd_editor);
 		//PurgeComm(sp_hdr, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
 	}
-
 
 	CloseHandle(asy_io.hEvent);
 	return 0;
