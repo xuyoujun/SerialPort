@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 
-static BOOL get_data_form_editor(HWND hwnd, TCHAR *buffer) {
+static INT get_data_form_editor(HWND hwnd, TCHAR *buffer) {
 	INT   data_format;
 	HWND  hwnd_hex;
 	DWORD len = MAX_BUFFER_SIZE;
@@ -12,9 +12,11 @@ static BOOL get_data_form_editor(HWND hwnd, TCHAR *buffer) {
 	len = strlen(buffer);
 	
 	if (HEX_DATA == data_format) {
-		 return convent_to_hex(buffer, len);
+		if (!convent_to_hex(buffer, len)) {
+			return 0;
+		}
 	}
-	return TRUE;
+	return len;
 }
 
 BOOL send_serial_port(HWND hwnd, HANDLE sp_hdr) {
@@ -32,18 +34,27 @@ BOOL send_serial_port(HWND hwnd, HANDLE sp_hdr) {
 		
 	PurgeComm(sp_hdr, PURGE_TXCLEAR);
 	ZeroMemory(buffer, sizeof(buffer));
-	ret = get_data_form_editor(hwnd, buffer);
+	len = get_data_form_editor(hwnd, buffer);
 	
-	if (FALSE == ret) {
+	if (0 == len) {
 		MessageBox(hwnd, TEXT("Data is illegal."), TEXT("Error"), MB_OK);
 		return ret;
 	}
-
+	/* Event is used to sync */
 	asy_io.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	/* If the write operation is not done, 	
+	 * the event will*/
 	wr_stat = WriteFile(sp_hdr, buffer, len, &len, &asy_io);
 	
-	if ((FALSE == wr_stat) && (ERROR_IO_PENDING == GetLastError())) {
-		WaitForSingleObject(asy_io.hEvent, 500);
+	if (FALSE == wr_stat){
+		if (ERROR_IO_PENDING == GetLastError()) {
+			WaitForSingleObject(asy_io.hEvent, 500);
+			GetOverlappedResult(sp_hdr, &asy_io, &len, FALSE);
+		}
+		else {
+			MessageBox(NULL, "Send data get trouble!", TEXT("Error"), MB_OK);
+		}
 	}
 
 	CloseHandle(asy_io.hEvent);

@@ -97,7 +97,8 @@ BOOL set_serial_port(HWND hwnd, HANDLE sp_hdr) {
 	/*clear receive and send buffer*/
 	PurgeComm(sp_hdr,PURGE_TXCLEAR|PURGE_RXCLEAR);
 	/*Set the event serial port monitor */
-	SetCommMask(sp_hdr, EV_RXCHAR | EV_TXEMPTY);
+	//SetCommMask(sp_hdr, EV_RXCHAR | EV_TXEMPTY);
+	SetCommMask(sp_hdr, EV_RXCHAR);
 	/* Create a thread to receive data */
 	CreateThread(NULL, 0, receive_serial_port_thread, sp_hdr, 0, 0);//开始读线程
 	/* hide the open botton */

@@ -32,6 +32,7 @@ DWORD WINAPI receive_serial_port_thread(LPVOID lpParam)//用于读线程的函数
 	HANDLE     sp_hdr;      /* serial port handler */
 	BOOL       rd_stat;     /* read status */
 	DWORD      err_type;    /* error type*/
+	DWORD      mask_type;
 	COMSTAT    sp_stat;     /* serial port status */
 	HWND       hwnd_editor;
 	OVERLAPPED asy_io;
@@ -42,31 +43,56 @@ DWORD WINAPI receive_serial_port_thread(LPVOID lpParam)//用于读线程的函数
 	ZeroMemory(&asy_io, sizeof(asy_io));
 	ZeroMemory(buffer , sizeof(buffer));
 	hwnd_editor = GetDlgItem(main_hwnd, IDC_RICHEDIT22);
+	asy_io.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	if (FALSE == asy_io.hEvent) {
+		MessageBox(NULL, "Error: can't create receive event!", TEXT("Error"), MB_OK);
+		return 0;
+	}
 
 	while (1) {
-		len = MAX_BUFFER_SIZE;
-		ZeroMemory(&asy_io, sizeof(asy_io));
+
 		ZeroMemory(buffer, sizeof(buffer));
-		asy_io.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+		rd_stat = WaitCommEvent(sp_hdr, &mask_type, &asy_io);
+		if (FALSE == rd_stat) {
+			if (ERROR_IO_PENDING == GetLastError()) {
+				GetOverlappedResult(sp_hdr, &asy_io, &len, TRUE);
+			//	MessageBox(NULL, "xx!", TEXT("Error"), MB_OK);
+			}
+		}
+
 		ClearCommError(sp_hdr, &err_type, &sp_stat);
 
-		/* none in buffer; Maybe can Sleep(30);*/
-		if (0 == sp_stat.cbInQue) {
-			CloseHandle(asy_io.hEvent);
+		len = sp_stat.cbInQue;
+		if (0 == len) {
+		//	MessageBox(NULL, "xx!", TEXT("Error"), MB_OK);
 			continue;
 		}
 
-		/* Data  is in buffer，0！=ComStat.cbInQue */
+		/* Not receive event */
+		if (!(mask_type & EV_RXCHAR)) {
+			continue;
+		}
+
 		rd_stat = ReadFile(sp_hdr, buffer, len, &len, &asy_io);
 
-		if (FALSE == rd_stat && (ERROR_IO_PENDING == GetLastError())) {
-			GetOverlappedResult(sp_hdr, &asy_io, &len, TRUE);
+		if (FALSE == rd_stat){
+			break;
+			//MessageBox(NULL, "uu!", TEXT("Error"), MB_OK);
+			/*if (ERROR_IO_PENDING == GetLastError()) {
+				GetOverlappedResult(sp_hdr, &asy_io, &len, TRUE);
+				if (0 == len) {
+					continue;
+				}
+			}*/
 		}
 
 		insert_to_editor(buffer, hwnd_editor);
-		PurgeComm(sp_hdr, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
-		CloseHandle(asy_io.hEvent);
-
+		//PurgeComm(sp_hdr, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
 	}
+
+
+	CloseHandle(asy_io.hEvent);
 	return 0;
 }
