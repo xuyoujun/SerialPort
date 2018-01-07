@@ -45,6 +45,8 @@ DWORD WINAPI receive_serial_port_thread(LPVOID lpParam)//用于读线程的函数
 
 	while (1) {
 		len = MAX_BUFFER_SIZE;
+		ZeroMemory(&asy_io, sizeof(asy_io));
+		ZeroMemory(buffer, sizeof(buffer));
 		asy_io.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		ClearCommError(sp_hdr, &err_type, &sp_stat);
 
@@ -64,8 +66,7 @@ DWORD WINAPI receive_serial_port_thread(LPVOID lpParam)//用于读线程的函数
 		insert_to_editor(buffer, hwnd_editor);
 		PurgeComm(sp_hdr, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
 		CloseHandle(asy_io.hEvent);
-		ZeroMemory(&asy_io, sizeof(asy_io));
-		ZeroMemory(buffer, sizeof(buffer));
+
 	}
 	return 0;
 }
